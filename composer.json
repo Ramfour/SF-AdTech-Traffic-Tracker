@@ -1,0 +1,17 @@
+{
+    "name": "sfadtech/traffic-tracker",
+    "description": "SF-AdTech — трекер трафика для рекламодателей и веб-мастеров",
+    "type": "project",
+    "license": "MIT",
+    "require": {
+        "php": ">=8.1"
+    },
+    "autoload": {
+        "psr-4": {
+            "App\\": "application/"
+        }
+    },
+    "config": {
+        "optimize-autoloader": true
+    }
+}
