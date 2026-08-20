@@ -1,0 +1,17 @@
+/* SF-AdTech — дополнительные стили */
+
+.min-vh-25 { min-height: 200px; }
+
+/* Kanban карточки */
+.offer-card {
+    cursor: grab;
+    transition: box-shadow .15s, opacity .15s;
+}
+.offer-card:active { cursor: grabbing; }
+.offer-card.dragging { opacity: .45; }
+
+/* Drop-zone подсветка */
+.kanban-col.drag-over {
+    outline: 2px dashed #0d6efd;
+    background: #f0f6ff !important;
+}
