@@ -94,8 +94,8 @@ class AdvertiserController extends BaseController
     {
         $this->requireAuth('advertiser');
 
-        $period  = in_array($_GET['period'] ?? 'day', ['day', 'month', 'year'], true)
-                   ? $_GET['period'] : 'day';
+        $periodRaw = $_GET['period'] ?? 'day';
+        $period    = in_array($periodRaw, ['day', 'month', 'year'], true) ? $periodRaw : 'day';
         $offerId = isset($_GET['offer_id']) ? (int)$_GET['offer_id'] : null;
         $user    = $_SESSION['user'];
 
