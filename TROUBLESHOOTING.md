@@ -155,3 +155,57 @@ sudo ss -tlnp | grep php
 ```
 
 **Решение.** Исправить порт в nginx-конфиге под реальный из вывода `ss`.
+
+---
+
+## 8. HTTP 500 на `/webmaster/stats` и `/advertiser/stats`
+
+**Симптом.**
+```
+PHP Fatal error: Uncaught TypeError: ClickModel::statsByWebmaster():
+Argument #2 ($period) must be of type string, null given
+```
+
+**Причина.** Ошибка в тернарном операторе в обоих контроллерах:
+
+```php
+// Баг: правая ветка тернарника возвращает $_GET['period'] напрямую,
+// который равен null когда параметр не передан в URL
+$period = in_array($_GET['period'] ?? 'day', ['day', 'month', 'year'], true)
+          ? $_GET['period'] : 'day';
+```
+
+`in_array` получает `'day'` (через `??`) и возвращает `true`, но затем тернарник берёт `$_GET['period']` — а он `null`.
+
+**Решение.** Разделить на две строки:
+
+```php
+$periodRaw = $_GET['period'] ?? 'day';
+$period    = in_array($periodRaw, ['day', 'month', 'year'], true) ? $periodRaw : 'day';
+```
+
+Исправлено в `WebmasterController.php` и `AdvertiserController.php`.
+
+---
+
+## 9. `git pull` падает повторно с «local changes» после каждого деплоя
+
+**Симптом.** При каждом `git pull` на сервере возникает конфликт — даже если вы не редактировали файлы вручную.
+
+**Причина.** Git на сервере видит файлы как изменённые из-за разницы окончаний строк (CRLF на Windows → LF на Linux). При клонировании или первом pull файлы записались с LF, но git считает их изменёнными относительно CRLF-версии из репозитория.
+
+**Решение.** Сбросить конкретные файлы и подтянуть:
+
+```bash
+sudo git -C /var/www/sfadtech checkout -- <file1> <file2> ...
+sudo git -C /var/www/sfadtech pull origin main
+```
+
+Либо сбросить все отслеживаемые файлы сразу:
+
+```bash
+sudo git -C /var/www/sfadtech checkout -- .
+sudo git -C /var/www/sfadtech pull origin main
+```
+
+> `config.php` в `.gitignore` — он не будет затронут при `checkout -- .`.
